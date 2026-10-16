@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SomaiyaSat: AI Data Router for a PocketQube</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f6f3ec;--card:#fffdf8;--ink:#1d2b28;--muted:#56625d;--line:#d9d3c5;--accent:#b0431a;--teal:#1f6f66;--amber:#a3730b;--slate:#51606b;--ok:#1f6f66;--bad:#a8321e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a18;--card:#1a2421;--ink:#e9eeea;--muted:#a3b0aa;--line:#2f3d38;--accent:#e2874f;--teal:#5fb8ac;--amber:#d9a73c;--slate:#8fa1ae;--ok:#5fb8ac;--bad:#ee8470}}
+:root[data-theme="dark"]{--bg:#121a18;--card:#1a2421;--ink:#e9eeea;--muted:#a3b0aa;--line:#2f3d38;--accent:#e2874f;--teal:#5fb8ac;--amber:#d9a73c;--slate:#8fa1ae;--ok:#5fb8ac;--bad:#ee8470}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.65 "Public Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:Newsreader,Georgia,serif;line-height:1.2;margin:0 0 .5em;font-weight:600}
+h1{font-size:clamp(2rem,5.5vw,3.2rem);max-width:18ch}
+h2{font-size:clamp(1.55rem,3.5vw,2.1rem)}
+h3{font-size:1.2rem}
+p{margin:0 0 1em;max-width:66ch}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+section{padding:56px 0;border-top:1px solid var(--line)}
+header{padding:16px 0}
+header .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:center}
+.brand{font:600 1rem Newsreader,Georgia,serif}
+nav{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:.92rem}
+nav a{color:var(--muted);text-decoration:none}nav a:hover{color:var(--accent)}
+.hero{padding:48px 0 56px;border:0}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:12px}
+.lead{font-size:1.15rem;color:var(--muted)}
+.facts{display:flex;flex-wrap:wrap;gap:12px 40px;margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+.facts div{min-width:120px}.facts b{display:block;font:600 1.6rem Newsreader,Georgia,serif}.facts span{font-size:.85rem;color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px}
+.cols p{margin:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:20px}
+svg text{font-family:"Public Sans",system-ui,sans-serif;fill:var(--ink)}
+.scroll{overflow-x:auto}
+/* simulator */
+.sim{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:24px;align-items:start}
+@media(max-width:780px){.sim{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:.92rem;margin-top:16px}
+label:first-child{margin-top:0}
+label output{float:right;font-weight:500;color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0 0;height:28px}
+.check{display:flex;gap:10px;align-items:center;font-weight:500;margin-top:14px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+button{font:inherit;font-size:.9rem;min-height:40px;padding:6px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button[aria-pressed=true],button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.status{display:inline-block;font-size:.85rem;font-weight:600;padding:3px 10px;border-radius:4px;border:1px solid currentColor;margin-bottom:12px}
+.bar{display:flex;height:44px;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:repeating-linear-gradient(45deg,transparent 0 6px,var(--line) 6px 7px)}
+.seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.78rem;font-weight:600;overflow:hidden;white-space:nowrap}
+.seg.ttc{background:var(--slate)}.seg.sstv{background:var(--accent)}.seg.codec2{background:var(--teal)}.seg.m17{background:var(--amber)}
+.axis{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin:4px 0 16px}
+ul.log{list-style:none;padding:0;margin:0}
+ul.log li{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line);font-size:.95rem}
+.tag{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:3px;height:fit-content;text-align:center;min-width:64px}
+.tag.sent{background:var(--ok);color:var(--bg)}.tag.skip{background:transparent;color:var(--bad);border:1px solid var(--bad)}.tag.warn{background:var(--amber);color:var(--bg)}
+.meter{display:flex;flex-wrap:wrap;gap:8px 28px;margin:12px 0 4px;font-size:.92rem;color:var(--muted)}.meter b{color:var(--ink)}
+/* steps */
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.stepbody{min-height:140px}
+.stepnav{display:flex;gap:8px;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+footer{padding:32px 0 48px;border-top:1px solid var(--line);font-size:.9rem;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<header><div class="wrap"><span class="brand">SomaiyaSat · KJS-SRS-01</span>
+<nav><a href="#problem">Problem</a><a href="#design">Design</a><a href="#simulator">Simulator</a><a href="#mission">Mission</a><a href="#modes">Radio modes</a><a href="#safety">Safety</a></nav></div></header>
+
+<main>
+<section class="hero"><div class="wrap">
+<div class="eyebrow">K J Somaiya · Mini project, AI use case</div>
+<h1>A small satellite that decides what to send, and when.</h1>
+<p class="lead">SomaiyaSat is a PocketQube, a satellite about the size of a coffee mug. It gets only a few short passes over a ground station each day. An onboard scheduler chooses which data goes down in each pass: health data first, then images, then voice.</p>
+<div class="facts">
+<div><b>5 cm</b><span>base cube size of a PocketQube</span></div>
+<div><b>&lt; 1 W</b><span>typical average power</span></div>
+<div><b>4</b><span>radio modes sharing one link</span></div>
+<div><b>1</b><span>rule that never breaks: health data goes first</span></div>
+</div></div></section>
+
+<section id="problem"><div class="wrap">
+<h2>The problem</h2>
+<div class="cols">
+<div><h3>Little time</h3><p>A satellite in low Earth orbit is in range of one ground station for only a few minutes per pass. Everything has to fit in that window.</p></div>
+<div><h3>Little power</h3><p>Solar panels are tiny and the battery drains during eclipse. Every transmission costs energy that is hard to get back.</p></div>
+<div><h3>Too much to send</h3><p>Telemetry, SSTV pictures, Codec2 voice and M17 data all compete for the same radio. Manual control from the ground is too slow.</p></div>
+</div></div></section>
+
+<section id="design"><div class="wrap">
+<h2>How the system is built</h2>
+<p>Four inputs feed one decision-maker. The decision-maker controls the radio modes and talks to the ground through a single transceiver. The model is deliberately small (a decision tree or tiny network) so it fits on a low-power microcontroller.</p>
+<div class="panel scroll">
+<svg viewBox="0 0 760 330" role="img" aria-label="Architecture: four inputs go into the AI manager, which controls four radio modes and one transceiver to the ground station" style="min-width:640px;width:100%;height:auto">
+<g fill="none" stroke="var(--muted)" stroke-width="1.5">
+<path d="M190 55h90M190 125h90M190 195h90M190 265h90"/><path d="M480 55h90M480 125h90M480 195h90M480 265h90"/><path d="M380 280v30h230"/></g>
+<g fill="var(--card)" stroke="var(--line)" stroke-width="1.5">
+<rect x="20" y="30" width="170" height="50" rx="4"/><rect x="20" y="100" width="170" height="50" rx="4"/><rect x="20" y="170" width="170" height="50" rx="4"/><rect x="20" y="240" width="170" height="50" rx="4"/>
+<rect x="570" y="30" width="170" height="50" rx="4"/><rect x="570" y="100" width="170" height="50" rx="4"/><rect x="570" y="170" width="170" height="50" rx="4"/><rect x="570" y="240" width="170" height="50" rx="4"/></g>
+<rect x="280" y="20" width="200" height="270" rx="4" fill="var(--ink)"/>
+<g font-size="14" text-anchor="middle">
+<text x="105" y="60">Link quality</text><text x="105" y="130">Battery and power</text><text x="105" y="200">Pass predictor</text><text x="105" y="270">Data queue</text>
+<text x="655" y="60">TT&amp;C / housekeeping</text><text x="655" y="130">SSTV images</text><text x="655" y="200">Codec2 voice</text><text x="655" y="270">M17 voice and data</text>
+<text x="380" y="140" style="fill:var(--bg);font-weight:600;font-size:16px">AI scheduler</text>
+<text x="380" y="164" style="fill:var(--bg)">on SomaiyaSat</text>
+<text x="490" y="322" text-anchor="start" style="font-size:13px">RF transceiver to ground station</text></g>
+</svg></div>
+<p style="margin-top:16px;font-size:.92rem;color:var(--muted)">Based on the architecture figure in the KJS-SRS-01 use case document.</p>
+</div></section>
+
+<section id="simulator"><div class="wrap">
+<h2>Try the scheduler</h2>
+<p>Change the conditions of one ground pass and see what the satellite decides to send. This is a simplified model of the real policy, built to show the logic, not real flight code.</p>
+<div class="sim">
+<div class="panel">
+<label for="link">Link quality <output id="linkO"></output></label><input id="link" type="range" min="5" max="100" value="75">
+<label for="batt">Battery <output id="battO"></output></label><input id="batt" type="range" min="5" max="100" value="80">
+<label for="pass">Pass length <output id="passO"></output></label><input id="pass" type="range" min="2" max="12" value="8">
+<label class="check"><input type="checkbox" id="ecl"> Satellite is in eclipse</label>
+<label class="check"><input type="checkbox" id="fault"> Inject a faulty AI output</label>
+<div class="presets" role="group" aria-label="Presets">
+<button data-p="75,80,8,0">Good pass</button><button data-p="30,70,5,0">Weak signal</button><button data-p="70,22,8,1">Low battery</button><button data-p="90,95,12,0">Best case</button></div>
+</div>
+<div class="panel" aria-live="polite">
+<span class="status" id="status"></span>
+<div class="bar" id="bar"></div>
+<div class="axis"><span>Pass start</span><span id="endLbl"></span></div>
+<div class="meter" id="meter"></div>
+<ul class="log" id="log"></ul>
+</div></div></div></section>
+
+<section id="mission"><div class="wrap">
+<h2>Mission, step by step</h2>
+<div class="steps" id="steps" role="tablist"></div>
+<div class="panel stepbody"><h3 id="stT"></h3><p id="stP" style="margin:0"></p>
+<div class="stepnav"><button id="prev">Back</button><button id="next">Next</button></div></div>
+</div></section>
+
+<section id="modes"><div class="wrap">
+<h2>Four radio modes, one priority order</h2>
+<div class="panel scroll"><table>
+<tr><th>Priority</th><th>Mode</th><th>What it carries</th><th>Cost to send</th></tr>
+<tr><td>1</td><td>TT&amp;C / housekeeping</td><td>Satellite health, temperature, battery, commands from ground</td><td>Very low</td></tr>
+<tr><td>2</td><td>SSTV</td><td>Images from the onboard camera, sent as slow-scan TV</td><td>High: long and needs a clear link</td></tr>
+<tr><td>3</td><td>Codec2</td><td>Compressed digital voice for amateur radio users</td><td>Medium</td></tr>
+<tr><td>4</td><td>M17</td><td>Digital voice and data for the ham community</td><td>Medium to high</td></tr>
+</table></div></div></section>
+
+<section id="safety"><div class="wrap">
+<h2>Safety and rules</h2>
+<div class="cols">
+<div><h3>Never lose contact</h3><p>If the AI output looks wrong, a watchdog switches to a fixed rule-based order. Try the fault switch in the simulator.</p></div>
+<div><h3>Humans can override</h3><p>Ground operators can send commands that override the scheduler, and safe mode limits what it can do.</p></div>
+<div><h3>Explainable choices</h3><p>Each decision is logged with its reason, so the ground team can debug it. The log above is a small version of this.</p></div>
+<div><h3>Licensing</h3><p>Amateur radio frequencies and launch registration must follow ITU and national rules, and are handled early in the project.</p></div>
+</div></div></section>
+</main>
+
+<footer><div class="wrap">Source: AI Use Case KJS-SRS-01, K J Somaiya Institute of Technology and K J Somaiya School of Engineering. Faculty owners: Dr. Umesh Shinde and Dr. Shailesh Nikam. Collaborating organization: ReOrbit, Finland.</div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const modes=[
+{id:'ttc',name:'TT&C / housekeeping',short:'TT&C',base:20,pw:1,min:10},
+{id:'sstv',name:'SSTV image',short:'SSTV',base:110,pw:6,min:50},
+{id:'codec2',name:'Codec2 voice',short:'Codec2',base:60,pw:3,min:30},
+{id:'m17',name:'M17 voice/data',short:'M17',base:90,pw:4,min:40}];
+function run(){
+ const link=+$('link').value,batt=+$('batt').value,pass=+$('pass').value,ecl=$('ecl').checked,fault=$('fault').checked;
+ $('linkO').textContent=link+'%';$('battO').textContent=batt+'%';$('passO').textContent=pass+' min';
+ const total=pass*60,reserve=ecl?35:20;let powerLeft=Math.max(0,batt-reserve),timeLeft=total;
+ const need=m=>Math.round(m.base*(1+(100-link)/50)); // weak link means retries
+ const log=[];let segs=[],safe=batt<20;
+ let order=modes.slice();
+ if(fault){order=[modes[1],modes[3],modes[2],modes[0]];
+  log.push(['warn','Watchdog','AI output put TT&C last, which breaks the health-data-first rule. Switched to the fixed rule-based order.']);order=modes.slice();}
+ if(safe)log.push(['warn','Safe mode','Battery is below 20%, so only TT&C is allowed.']);
+ order.forEach(m=>{
+  const t=need(m);let why='';
+  if(m.id==='ttc'){ // always sent, even with no spare power
+    timeLeft-=Math.min(t,timeLeft);segs.push([m,Math.min(t,total)]);powerLeft=Math.max(0,powerLeft-m.pw);
+    log.push(['sent',m.short,'Sent. Health data always goes first ('+t+' s).']);return;}
+  if(safe)why='Safe mode is on.';
+  else if(link<m.min)why='Link is '+link+'%, but this mode needs at least '+m.min+'%.';
+  else if(t>timeLeft)why='Needs '+t+' s, only '+timeLeft+' s left in the pass.';
+  else if(m.pw>powerLeft)why='Needs '+m.pw+'% battery, only '+powerLeft+'% spare above the '+reserve+'% reserve.';
+  if(why){log.push(['skip',m.short,'Held for a later pass. '+why]);return;}
+  timeLeft-=t;powerLeft-=m.pw;segs.push([m,t]);
+  log.push(['sent',m.short,'Sent in '+t+' s, using '+m.pw+'% battery.']);});
+ const used=total-timeLeft;
+ $('bar').innerHTML=segs.map(([m,t])=>'<div class="seg '+m.id+'" style="width:'+(t/total*100)+'%" title="'+m.name+' '+t+' s">'+(t/total>.09?m.short:'')+'</div>').join('');
+ $('endLbl').textContent='Pass end ('+pass+' min)';
+ const sent=segs.length;
+ const st=$('status');st.textContent=safe?'Safe mode':sent===modes.length?'All data sent':sent===1?'Health data only':sent+' of 4 modes sent';
+ st.style.color=safe||sent===1?'var(--bad)':sent===modes.length?'var(--ok)':'var(--amber)';
+ $('meter').innerHTML='<span>Airtime used <b>'+used+' of '+total+' s</b></span><span>Spare battery used <b>'+(Math.max(0,batt-reserve)-powerLeft)+'%</b></span><span>Battery reserve <b>'+reserve+'%</b></span>';
+ $('log').innerHTML=log.map(l=>'<li><span class="tag '+l[0]+'">'+(l[0]==='skip'?'Held':l[0]==='sent'?'Sent':'Alert')+'</span><span><b>'+l[1]+'.</b> '+l[2]+'</span></li>').join('');
+}
+['link','batt','pass','ecl','fault'].forEach(i=>$(i).addEventListener('input',run));
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=b.dataset.p.split(',');$('link').value=p[0];$('batt').value=p[1];$('pass').value=p[2];$('ecl').checked=p[3]==='1';$('fault').checked=false;run();});
+run();
+const steps=[
+['Launch','SomaiyaSat rides inside SomaiyaPod, the deployer. The pod holds it firmly through launch loads and keeps it switched off.'],
+['Release','At the planned point in orbit, a timer fires the release mechanism and the pod pushes the satellite out. Separation switches or a short beacon confirm it left.'],
+['Commissioning','The confirmation signal wakes the satellite. It starts its systems, checks its battery and sends its first health data to the ground.'],
+['Pass operations','On each ground pass the AI scheduler reads link quality and battery, then picks the order and mode of transmission. This is the part you tried above.'],
+['Downlink and review','The ground station software receives, decodes and shows the data. Telemetry feeds back into improving the model for next time.']];
+let cur=0;const sb=$('steps');
+steps.forEach((s,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+s[0];b.onclick=()=>go(i);sb.appendChild(b);});
+function go(i){cur=Math.max(0,Math.min(steps.length-1,i));[...sb.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===cur));$('stT').textContent=steps[cur][0];$('stP').textContent=steps[cur][1];$('prev').disabled=cur===0;$('next').disabled=cur===steps.length-1;}
+$('prev').onclick=()=>go(cur-1);$('next').onclick=()=>go(cur+1);go(0);
+</script>
+</body>
+</html>
